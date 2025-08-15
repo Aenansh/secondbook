@@ -1,6 +1,13 @@
 "use server";
 
-import { Account, Avatars, Client, Databases, Storage } from "node-appwrite";
+import {
+  Account,
+  Avatars,
+  Client,
+  Databases,
+  Storage,
+  Users,
+} from "node-appwrite";
 import { appConfig } from "./constants";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -13,7 +20,7 @@ export const createSessionClient = async () => {
   const session = (await cookies()).get("appwrite-session");
 
   if (!session || !session.value) {
-     return redirect("/sign-in");
+    return redirect("/sign-in");
   }
 
   client.setSession(session.value);
@@ -46,6 +53,9 @@ export const createAdminClient = async () => {
     },
     get avatars() {
       return new Avatars(client);
+    },
+    get users() {
+      return new Users(client);
     },
   };
 };

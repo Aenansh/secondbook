@@ -46,15 +46,16 @@ export const createUserAccount = async ({
   email: string;
   password: string;
 }) => {
+  const { databases, account } = await createAdminClient();
   const existingUser = await getUserByEmail(email);
+  const name = username;
+  const newUser = await account.create(ID.unique(), email, password, name);
 
   const accountId = await sendOTP({ email });
 
   if (!accountId) throw new Error("OTP failed!");
 
   if (!existingUser) {
-    const { databases } = await createAdminClient();
-
     await databases.createDocument(
       appConfig.dbId,
       appConfig.userCollId,
@@ -139,6 +140,12 @@ export const loginUser = async ({
     const existingUser = await getUserByEmail(email);
 
     if (existingUser) {
+      const { account } = await createAdminClient();
+      const verifyPassword = await account.createEmailPasswordSession(
+        email,
+        password
+      );
+      if (!verifyPassword) throw new Error("Incorrect Password!");
       await sendOTP({ email });
       return parseStringify({ accountId: existingUser.accountId });
     }
@@ -166,7 +173,9 @@ export const updateUserAvatar = async ({
     // THE FIX: Convert ArrayBuffer to Buffer before creating the InputFile
     const buffer = Buffer.from(await file.arrayBuffer());
     const inputFile = InputFile.fromBuffer(buffer, file.name);
+    const userDoc = await getUserById(userId);
 
+    await storage.deleteFile(appConfig.bucketId, userDoc.avatarId);
     const uploadedFile = await storage.createFile(
       appConfig.bucketId,
       ID.unique(),
@@ -213,7 +222,7 @@ export const deleteAvatar = async () => {
   }
 };
 
-export const getUserById = async (userId: string) => {
+export const getUserByAccount = async (userId: string) => {
   try {
     const { databases } = await createAdminClient();
 
@@ -226,5 +235,86 @@ export const getUserById = async (userId: string) => {
     return user.total > 0 ? parseStringify(user) : null;
   } catch (error) {
     handleError(error, "No user found!");
+  }
+};
+export const getUserById = async (userId: string) => {
+  try {
+    const { databases } = await createAdminClient();
+
+    const user = await databases.listDocuments(
+      appConfig.dbId,
+      appConfig.userCollId,
+      [Query.equal("$id", [userId])]
+    );
+
+    return user.total > 0 ? parseStringify(user) : null;
+  } catch (error) {
+    handleError(error, "No user found!");
+  }
+};
+
+export const deleteAccount = async (userId: string, accountId: string) => {
+  console.log("--- Attempting to delete account ---");
+  console.log(`Received Document ID (userId): ${userId}`);
+  console.log(`Received Auth ID (accountId): ${accountId}`);
+
+  if (!userId || !accountId) {
+    handleError(null, "Error: Missing userId or accountId.");
+    return;
+  }
+
+  try {
+    const { users, databases, storage } = await createAdminClient();
+
+    // --- Step 1: Find and delete all posts and their associated files ---
+    console.log("Step 1: Finding and deleting user posts and files...");
+    const userPosts = await databases.listDocuments(
+      appConfig.dbId,
+      appConfig.fileCollId,
+      [Query.equal("owner", userId)]
+    );
+
+    if (userPosts.documents.length > 0) {
+      const deletePromises = userPosts.documents.map(async (post) => {
+        try {
+          await databases.deleteDocument(
+            appConfig.dbId,
+            appConfig.fileCollId,
+            post.$id
+          );
+          if (post.bucketFileId) {
+            await storage.deleteFile(appConfig.bucketId, post.bucketFileId);
+          }
+        } catch (error) {
+          console.warn(
+            `Could not delete post ${post.$id} or its file. Continuing...`
+          );
+        }
+      });
+      await Promise.all(deletePromises);
+    }
+    console.log("Step 1: Complete.");
+
+    // --- Step 2: Delete the user's database document ---
+    console.log("Step 2: Deleting user document...");
+    await databases.deleteDocument(
+      appConfig.dbId,
+      appConfig.userCollId,
+      userId
+    );
+    console.log("Step 2: Complete.");
+
+    // --- Step 3: Delete the user from the Auth service ---
+    console.log("Step 3: Deleting auth user...");
+    await users.delete(accountId);
+    console.log("Step 3: Complete.");
+
+    console.log("--- Account deleted successfully. ---");
+    return { success: true };
+  } catch (error) {
+    handleError(
+      error,
+      `Failed during account deletion process for user ${accountId}.`
+    );
   }
 };

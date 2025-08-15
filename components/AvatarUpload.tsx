@@ -14,14 +14,7 @@ import { deleteAvatar, logout } from "@/actions/user.actions";
 import { updateUserAvatar } from "@/actions/user.actions";
 import { useRouter } from "next/navigation";
 import ImageCropper from "./ImageCropper"; // Import the new component
-
-interface User {
-  username: string;
-  email: string;
-  avatar: string;
-  privacy: boolean;
-  $id: string;
-}
+import Privacy from "./Privacy";
 
 const AvatarUpload = ({ avatar, user }: { avatar: string; user: User }) => {
   const router = useRouter();
@@ -60,7 +53,11 @@ const AvatarUpload = ({ avatar, user }: { avatar: string; user: User }) => {
       <DropdownMenu>
         <DropdownMenuTrigger className="active:border-none outline-none">
           <div className="relative w-[90px] h-[90px] rounded-full overflow-hidden">
-            <Image src={avatar} alt="profile" fill className="object-cover" />
+            {isUploading ? (
+              <Image src={"/assets/icons/loader.svg"} alt="loader" fill />
+            ) : (
+              <Image src={avatar} alt="profile" fill className="object-cover" />
+            )}
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -69,7 +66,7 @@ const AvatarUpload = ({ avatar, user }: { avatar: string; user: User }) => {
           <DropdownMenuItem onSelect={() => inputRef.current?.click()}>
             {isUploading ? "Uploading..." : "Change Avatar"}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={deleteAvatar}>
+          <DropdownMenuItem onClick={deleteAvatar} className="text-red-600">
             Delete avatar
           </DropdownMenuItem>
           <DropdownMenuItem

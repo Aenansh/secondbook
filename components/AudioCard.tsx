@@ -4,29 +4,14 @@ import { useState, useRef, useEffect } from "react";
 import WaveSurfer from "wavesurfer.js";
 import { Play, Pause } from "lucide-react";
 import Image from "next/image";
-
-// Define the interface for the Post object
-interface Post {
-  title: string;
-  description: string;
-  url: string;
-  $id: string;
-  type: string;
-}
+import Link from "next/link";
+import CardDetails from "./CardDetails";
 
 // Props for the AudioPlayer component
 interface AudioPlayerProps {
   file: Post;
   user: User;
 }
-
-interface User {
-  username: string;
-  email: string;
-  avatar: string;
-  privacy: boolean;
-}
-
 const formatTime = (seconds: number): string => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
@@ -99,26 +84,7 @@ const AudioPlayer = ({ file, user }: AudioPlayerProps) => {
       </div>
 
       {/* Details Section */}
-      <div className="flex flex-col">
-        <div className="p-3 gap-1 flex flex-col">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-bold truncate text-gray-800 text-2xl line-clamp-1">
-              {file.title}
-            </h3>
-            <div className="relative w-[30px] h-[30px] rounded-full overflow-hidden">
-              <Image
-                src={user?.avatar || "/profile.jpg"}
-                alt="profile"
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
-          <p className="text-sm text-gray-600 truncate line-clamp-1">
-            {file.description}
-          </p>
-        </div>
-      </div>
+      <CardDetails file={file} user={user} />
     </div>
   );
 };

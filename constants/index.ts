@@ -20,5 +20,10 @@ export const navigations = (accountId: string) => {
       icon: "/assets/icons/user.svg",
       href: `/profile/${accountId}`,
     },
+    {
+      title: "Settings",
+      icon:"/assets/icons/settings.svg",
+      href: `/settings/${accountId}`
+    }
   ];
 };

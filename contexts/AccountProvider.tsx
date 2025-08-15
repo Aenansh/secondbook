@@ -28,14 +28,13 @@ const AccountProvider = ({ children }: { children: ReactNode }) => {
         console.log("accountId: ", user.accountId, "userId: ", user.$id);
         setAccountId(user.accountId);
         setUserId(user.$id);
-        console.log("accountId: ", accountId, "userId: ", userId);
       } catch (error) {
         console.log("Failed to fetch details", error);
         setAccountId(null);
         setUserId(null);
       }
-      fetchData();
     };
+    fetchData();
   }, []);
   const value = { accountId, userId };
   return (

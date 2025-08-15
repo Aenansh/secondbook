@@ -83,15 +83,38 @@ export const getAllPosts = async () => {
   try {
     const { databases } = await createAdminClient();
 
-    const posts = await databases.listDocuments(
+    // --- Step 1: Find all users with public profiles ---
+    const publicUsersResponse = await databases.listDocuments(
       appConfig.dbId,
-      appConfig.fileCollId,
-      [Query.notEqual("type", "avatar")]
+      appConfig.userCollId, // Your users collection ID
+      [
+        Query.equal("privacy", [false]) // Find users where privacy is false
+      ]
     );
 
-    return parseStringify(posts);
+    const publicUserIds = publicUsersResponse.documents.map(user => user.$id);
+
+    // If no public users are found, return an empty array immediately.
+    if (publicUserIds.length === 0) {
+      return { documents: [] };
+    }
+
+    // --- Step 2: Fetch posts created by those public users ---
+    const publicPosts = await databases.listDocuments(
+      appConfig.dbId,
+      appConfig.fileCollId, // Your posts collection ID
+      [
+        // Find posts where the 'owner' ID is in our list of public user IDs
+        Query.equal("owner", publicUserIds),
+        Query.notEqual("type", "avatar") // Optional: exclude avatars
+      ]
+    );
+
+    return parseStringify(publicPosts);
+
   } catch (error) {
-    handleError(error, "Can't fetch the posts!");
+    console.error("Failed to fetch public posts:", error);
+    return { documents: [] };
   }
 };
 
