@@ -5,6 +5,7 @@ import { Volume2, VolumeX } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import CardDetails from "./CardDetails";
+import PostMenu from "./PostMenu";
 
 const VideoCard = ({ file, user }: { file: Post; user: User }) => {
   // State to track hover status to show/hide the UI
@@ -49,6 +50,9 @@ const VideoCard = ({ file, user }: { file: Post; user: User }) => {
     >
       {/* Video Container */}
       <div className="relative w-full h-4/5 bg-black">
+        <div className="h-[40px] absolute z-10 cursor-pointer w-full bg-white flex justify-end px-3">
+          <PostMenu post={file} />
+        </div>
         <video
           ref={videoRef}
           src={file.url}
@@ -59,7 +63,7 @@ const VideoCard = ({ file, user }: { file: Post; user: User }) => {
         />
         {/* Mute button overlay */}
         {isHovered && (
-          <div className="absolute top-2 right-2">
+          <div className="absolute top-12 right-2">
             <button
               onClick={toggleMute}
               className="bg-black bg-opacity-50 text-white p-2 rounded-full"

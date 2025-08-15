@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { toast } from "sonner";
 
 declare interface AccountProps {
   accountId: string | null;
@@ -24,12 +25,10 @@ const AccountProvider = ({ children }: { children: ReactNode }) => {
     const fetchData = async () => {
       try {
         const user = await getCurrentUser();
-        console.log("user: ", user);
-        console.log("accountId: ", user.accountId, "userId: ", user.$id);
         setAccountId(user.accountId);
         setUserId(user.$id);
       } catch (error) {
-        console.log("Failed to fetch details", error);
+        toast.error("Failed to fetch user details!");
         setAccountId(null);
         setUserId(null);
       }

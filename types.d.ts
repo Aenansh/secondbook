@@ -17,4 +17,5 @@ declare interface Post {
   type: string;
   owner: User;
   bucketFileId: string;
+  name: string;
 }

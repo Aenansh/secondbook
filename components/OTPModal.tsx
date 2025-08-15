@@ -15,6 +15,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 import { Button } from "./ui/button";
 import { sendOTP, verifySecret } from "@/actions/user.actions";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const OTPModal = ({
   email,
@@ -39,13 +40,13 @@ const OTPModal = ({
         router.push("/");
       }
     } catch (error) {
-      console.log("Failed to fetch otp", error);
+      toast.error("Failed to verify OTP!");
     } finally {
       setLoading(false);
     }
   };
   const resendOtp = async () => {
-    await sendOTP({ email });  
+    await sendOTP({ email });
   };
   return (
     <>

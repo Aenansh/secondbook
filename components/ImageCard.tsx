@@ -18,7 +18,7 @@ const ImageCard = ({ file, user }: { file: Post; user: User }) => {
     >
       {/* Image Container */}
       <div className="relative w-full h-4/5">
-        <div className="h-[40px] absolute w-full bg-white flex justify-end px-3">
+        <div className="h-[40px] cursor-pointer absolute w-full bg-white flex justify-end px-3">
           <PostMenu post={file} />
         </div>
         <Image

@@ -32,7 +32,6 @@ const EditDetails = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const handleValue = async () => {
-    console.log(value);
     try {
       if (formType === "username") await changeUsername(user, value);
       else await changeEmail(user, value);

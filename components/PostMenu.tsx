@@ -10,13 +10,16 @@ import {
 import Image from "next/image";
 import { useAccount } from "@/contexts/AccountProvider";
 import { deletePost } from "@/actions/file.actions";
+import { toast } from "sonner";
+import Link from "next/link";
+import { constructDownloadUrl } from "@/lib/utils";
 
 const PostMenu = ({ post }: { post: Post }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { userId } = useAccount();
 
   const [isMounted, setIsMounted] = useState(false);
-
+  const [isDownloading, setIsDownloading] = useState(false);
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -32,7 +35,14 @@ const PostMenu = ({ post }: { post: Post }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem>Open</DropdownMenuItem>
-        <DropdownMenuItem>Download</DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link
+            href={constructDownloadUrl(post.bucketFileId)}
+            download={post.title}
+          >
+            Download
+          </Link>
+        </DropdownMenuItem>
         {isMounted && post.owner.$id === userId && (
           <DropdownMenuItem
             className="text-red-600"

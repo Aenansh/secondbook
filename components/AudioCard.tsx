@@ -6,6 +6,7 @@ import { Play, Pause } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import CardDetails from "./CardDetails";
+import PostMenu from "./PostMenu";
 
 // Props for the AudioPlayer component
 interface AudioPlayerProps {
@@ -61,8 +62,11 @@ const AudioPlayer = ({ file, user }: AudioPlayerProps) => {
   };
 
   return (
-    <div className="w-[250px] h-[500px] bg-white flex flex-col rounded-xl overflow-hidden shadow-lg">
+    <div className="w-[250px] h-[500px] relative bg-white flex flex-col rounded-xl overflow-hidden shadow-lg">
       {/* Media Area */}
+      <div className="h-[40px] cursor-pointer absolute w-full bg-white flex justify-end px-3">
+          <PostMenu post={file} />
+        </div>
       <div className="w-full h-4/5 bg-gray-100 flex flex-col items-center justify-center p-4 space-y-6">
         <button
           onClick={handlePlayPause}

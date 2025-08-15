@@ -24,7 +24,7 @@ const CardDetails = ({ file, user }: { file: Post; user: User }) => {
           </Link>
         </div>
         <div className="flex justify-between gap-2 items-center px-1">
-          <p className="text-sm text-gray-600 truncate line-clamp-1 max-w-[150px]">
+          <p className="text-sm text-gray-600 truncate line-clamp-1">
             {file.description}
           </p>
         </div>
