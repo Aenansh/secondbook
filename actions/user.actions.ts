@@ -169,13 +169,12 @@ export const updateUserAvatar = async ({
   try {
     const { storage, databases } = await createAdminClient();
 
-    // 1. Upload the new avatar file to storage
-    // THE FIX: Convert ArrayBuffer to Buffer before creating the InputFile
     const buffer = Buffer.from(await file.arrayBuffer());
     const inputFile = InputFile.fromBuffer(buffer, file.name);
     const userDoc = await getUserById(userId);
 
-    await storage.deleteFile(appConfig.bucketId, userDoc.avatarId);
+    if (userDoc.avatarId)
+      await storage.deleteFile(appConfig.bucketId, userDoc.avatarId);
     const uploadedFile = await storage.createFile(
       appConfig.bucketId,
       ID.unique(),
@@ -316,5 +315,62 @@ export const deleteAccount = async (userId: string, accountId: string) => {
       error,
       `Failed during account deletion process for user ${accountId}.`
     );
+  }
+};
+
+export const privacyUpdate = async (userId: string) => {
+  try {
+    const { databases } = await createAdminClient();
+    const user = await databases.listDocuments(
+      appConfig.dbId,
+      appConfig.userCollId,
+      [Query.equal("$id", userId)]
+    );
+    await databases.updateDocument(
+      appConfig.dbId,
+      appConfig.userCollId,
+      userId,
+      {
+        privacy: !user.documents[0].privacy,
+      }
+    );
+  } catch (error) {
+    handleError(error, "Failed to change the privacy settings!");
+  }
+};
+
+export const changeUsername = async (user: User, newName: string) => {
+  try {
+    const { databases, users } = await createAdminClient();
+
+    await databases.updateDocument(
+      appConfig.dbId,
+      appConfig.userCollId,
+      user.$id,
+      { username: newName }
+    );
+    await users.updateName(user.accountId, newName);
+  } catch (error) {
+    handleError(error, "failed to change the username!");
+  }
+};
+
+export const changeEmail = async (
+  user: User,
+  newEmail: string
+  // password: string
+) => {
+  try {
+    const { databases, users, account } = await createAdminClient();
+    // if (!password) throw new Error("Password is required!");
+    await users.updateEmail(user.accountId, newEmail);
+    await databases.updateDocument(
+      appConfig.dbId,
+      appConfig.userCollId,
+      user.$id,
+      { email: newEmail }
+    );
+  } catch (error) {
+    handleError(error, "failed to change the username!");
   }
 };

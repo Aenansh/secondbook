@@ -1,18 +1,31 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Privacy from "./Privacy";
 import { deleteAccount, logout } from "@/actions/user.actions";
 import { useRouter } from "next/navigation";
 import { useAccount } from "@/contexts/AccountProvider";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import EditDetails from "./EditDetails";
 
 // Assuming the User type is globally available
 // interface User { ... }
 
 const Settings = ({ user }: { user: User }) => {
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -54,9 +67,7 @@ const Settings = ({ user }: { user: User }) => {
                 <p className="font-medium">Username</p>
                 <p className="text-sm text-gray-500">{user.username}</p>
               </div>
-              <Button variant="outline" className="w-full sm:w-auto">
-                Edit
-              </Button>
+              <EditDetails formType="username" user={user} />
             </div>
             {/* Responsive layout for email */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -64,9 +75,7 @@ const Settings = ({ user }: { user: User }) => {
                 <p className="font-medium">Email</p>
                 <p className="text-sm text-gray-500">{user.email}</p>
               </div>
-              <Button variant="outline" className="w-full sm:w-auto">
-                Edit
-              </Button>
+              <EditDetails formType="email" user={user} />
             </div>
           </div>
         </div>
@@ -113,13 +122,29 @@ const Settings = ({ user }: { user: User }) => {
           <p className="text-sm text-gray-500 mb-4">
             Permanently delete your account and all of your content.
           </p>
-          <Button
-            variant="destructive"
-            className="w-full sm:w-auto"
-            onClick={handleDeleteAccount}
-          >
-            Delete Account
-          </Button>
+          <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialogTrigger asChild>
+              <Button variant={"destructive"}>Delete Account</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete your account</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Do you really want to delete your account? This action can't
+                  be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-red-600"
+                  onClick={handleDeleteAccount}
+                >
+                  Delete Account
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </>

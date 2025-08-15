@@ -27,7 +27,6 @@ const CardDetails = ({ file, user }: { file: Post; user: User }) => {
           <p className="text-sm text-gray-600 truncate line-clamp-1 max-w-[150px]">
             {file.description}
           </p>
-            <PostMenu post={file} />
         </div>
       </div>
     </div>

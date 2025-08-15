@@ -1,5 +1,6 @@
-"use client"
+"use client";
 
+import { privacyUpdate } from "@/actions/user.actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,9 +14,21 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const Privacy = ({ user }: { user: User }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleClick = async () => {
+    try {
+      await privacyUpdate(user.$id);
+      toast.success(
+        `Successfully made your account ${!user.privacy ? "private" : "public"}`
+      );
+    } catch (error) {
+      toast.error("Failed to change the user privacy!");
+    }
+  };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -26,15 +39,19 @@ const Privacy = ({ user }: { user: User }) => {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>
+            Do you want to make your account{" "}
+            {user.privacy === true ? "Public" : "Private"}?
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            You can always change the privacy of your account.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction className="bg-[#1f1f1f]" onClick={handleClick}>
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

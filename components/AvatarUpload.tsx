@@ -10,11 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
-import { deleteAvatar, logout } from "@/actions/user.actions";
+import { deleteAvatar } from "@/actions/user.actions";
 import { updateUserAvatar } from "@/actions/user.actions";
 import { useRouter } from "next/navigation";
 import ImageCropper from "./ImageCropper"; // Import the new component
-import Privacy from "./Privacy";
+import { toast } from "sonner";
 
 const AvatarUpload = ({ avatar, user }: { avatar: string; user: User }) => {
   const router = useRouter();
@@ -42,7 +42,7 @@ const AvatarUpload = ({ avatar, user }: { avatar: string; user: User }) => {
       router.refresh();
     } catch (error) {
       console.error("Failed to upload new avatar", error);
-      alert("Upload failed! Please try again.");
+      toast.error("Failed to upload the new avatar!");
     } finally {
       setIsUploading(false);
     }
@@ -68,12 +68,6 @@ const AvatarUpload = ({ avatar, user }: { avatar: string; user: User }) => {
           </DropdownMenuItem>
           <DropdownMenuItem onClick={deleteAvatar} className="text-red-600">
             Delete avatar
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={async () => await logout()}
-            className="text-red-600"
-          >
-            Log out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
