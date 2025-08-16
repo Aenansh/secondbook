@@ -42,8 +42,14 @@ const EditDetails = ({
           );
           return;
         }
-      } else await changeEmail(user, value);
-
+      } else {
+        if (value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
+          await changeEmail(user, value);
+        } else {
+          toast.error("Invalid email format!");
+          return;
+        }
+      }
       toast.success(`Change your ${formType} successfully!`);
     } catch (error) {
       toast.error("Failed to change the details!");
