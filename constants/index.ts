@@ -22,8 +22,12 @@ export const navigations = (accountId: string) => {
     },
     {
       title: "Settings",
-      icon:"/assets/icons/settings.svg",
-      href: `/settings/${accountId}`
-    }
+      icon: "/assets/icons/settings.svg",
+      href: `/settings/${accountId}`,
+    },
   ];
+};
+
+export const postRoute = (ownerId: string, postId: string) => {
+  return `/${ownerId}/${postId}`;
 };
