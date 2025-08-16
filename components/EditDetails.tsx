@@ -34,7 +34,7 @@ const EditDetails = ({
   const handleValue = async () => {
     try {
       if (formType === "username") {
-        if (value.match(/^[a-zA-Z0-9]+$/)) {
+        if (value.match(/^[a-zA-Z0-9._]+$/)) {
           await changeUsername(user, value.toLowerCase());
         } else {
           toast.error(

@@ -47,10 +47,17 @@ const secondaryVariant = {
 
 const fileFormSchema = () => {
   return z.object({
-    title: z.string().min(5).max(255).describe("Give a title to your post"),
-    description: z.string().min(5).max(1200).describe("Say something about it"),
+    title: z
+      .string()
+      .min(5, "Title must be at least 5 characters long.")
+      .max(255, "Title cannot be longer than 255 characters."),
+    description: z
+      .string()
+      .min(5, "Description must be at least 5 characters long.")
+      .max(1200, "Description cannot be longer than 1200 characters."),
   });
 };
+
 // Type definition for our state, ensuring each file has a unique ID
 type UploadedFile = {
   id: string;
@@ -135,16 +142,14 @@ export const FileUpload = ({
       const title = values.title;
       const description = values.description;
       const { file } = files[0];
-      await uploadFile({ file, title, description }).then(
-        (uploadedFile) => {
-          if (uploadedFile) {
-            setFiles([]);
-          }
-          console.log("file uploaded");
-          toast.success("Post created successfully!");
-          router.push(`/profile/${accountId}`);
+      await uploadFile({ file, title, description }).then((uploadedFile) => {
+        if (uploadedFile) {
+          setFiles([]);
         }
-      );
+        console.log("file uploaded");
+        toast.success("Post created successfully!");
+        router.push(`/profile/${accountId}`);
+      });
     } catch (error) {
       console.log("We failed to post!", error);
       toast.error("Post creation failed!");

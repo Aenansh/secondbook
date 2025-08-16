@@ -27,15 +27,21 @@ const authFormSchema = (formtype: FormType) => {
       formtype === "sign-up"
         ? z
             .string()
-            .min(5)
-            .max(255)
+            .min(5, "Username must be at least 5 characters.")
+            .max(15, "Username cannot be longer than 15 characters.")
             .toLowerCase()
-            .regex(/^[a-zA-Z0-9]+$/)
+            .regex(
+              /^[a-zA-Z0-9._]+$/,
+              "Username can only contain letters and numbers, with no spaces."
+            )
         : z.string().optional(),
-    email: z.email(),
+    email: z.email("Please enter a valid email address."),
     password: z
       .string()
-      .min(8)
+      .min(
+        8,
+        "Password must be at least 8 characters and include one uppercase, one lowercase, one number, and one special character."
+      )
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/,
         "Password must contain one uppercase, one lowercase, one number, and one special character."
