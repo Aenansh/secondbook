@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, MouseEvent } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,6 +26,10 @@ const VideoCard = ({ file, user }: { file: Post; user: User }) => {
 
   // Function to pause the video when the mouse leaves
   const handleMouseLeave = () => {
+    setStyle({
+      transform: "perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)",
+      transition: "transform 0.5s ease-in-out",
+    });
     setIsHovered(false);
     if (videoRef.current) {
       videoRef.current.pause();
@@ -42,14 +46,38 @@ const VideoCard = ({ file, user }: { file: Post; user: User }) => {
     }
   };
 
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [style, setStyle] = useState({});
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+
+    const { left, top, width, height } =
+      cardRef.current.getBoundingClientRect();
+    const x = e.clientX - left;
+    const y = e.clientY - top;
+
+    // Calculate position relative to the center of the card
+    const rotateX = ((y - height / 2) / (height / 2)) * -4; // Invert for natural feel, max 15deg rotation
+    const rotateY = ((x - width / 2) / (width / 2)) * 4; // Max 15deg rotation
+
+    setStyle({
+      transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`,
+      transition: "transform 0.1s ease-out",
+    });
+  };
+
   return (
     <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      style={style}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="w-[250px] h-[500px] bg-white flex flex-col rounded-xl overflow-hidden shadow-lg cursor-pointer"
+      className="w-[250px] h-[500px] bg-white flex flex-col rounded-xl overflow-hidden shadow-xl cursor-pointer"
     >
       {/* Video Container */}
-      <div className="relative w-full h-4/5 bg-black">
+      <div className="relative w-full h-4/5">
         <div className="h-[40px] absolute z-10 cursor-pointer w-full bg-white flex justify-end px-3">
           <PostMenu post={file} />
         </div>
@@ -59,7 +87,7 @@ const VideoCard = ({ file, user }: { file: Post; user: User }) => {
           loop
           muted // Start muted
           playsInline
-          className="w-full h-full object-cover" // Use object-contain to fit the video
+          className="w-full h-full object-cover p-1" // Use object-contain to fit the video
         />
         {/* Mute button overlay */}
         {isHovered && (

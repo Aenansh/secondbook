@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, MouseEvent } from "react";
 import WaveSurfer from "wavesurfer.js";
 import { Play, Pause } from "lucide-react";
 import Image from "next/image";
@@ -26,6 +26,33 @@ const AudioPlayer = ({ file, user }: AudioPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [style, setStyle] = useState({});
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+
+    const { left, top, width, height } =
+      cardRef.current.getBoundingClientRect();
+    const x = e.clientX - left;
+    const y = e.clientY - top;
+
+    // Calculate position relative to the center of the card
+    const rotateX = ((y - height / 2) / (height / 2)) * -4; // Invert for natural feel, max 15deg rotation
+    const rotateY = ((x - width / 2) / (width / 2)) * 4; // Max 15deg rotation
+
+    setStyle({
+      transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`,
+      transition: "transform 0.1s ease-out",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setStyle({
+      transform: "perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)",
+      transition: "transform 0.5s ease-in-out",
+    });
+  };
 
   useEffect(() => {
     if (!waveformRef.current) return;
@@ -62,11 +89,17 @@ const AudioPlayer = ({ file, user }: AudioPlayerProps) => {
   };
 
   return (
-    <div className="w-[250px] h-[500px] relative bg-white flex flex-col rounded-xl overflow-hidden shadow-lg">
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={style}
+      className="w-[250px] h-[500px] relative bg-white flex flex-col rounded-xl overflow-hidden shadow-lg p-1"
+    >
       {/* Media Area */}
       <div className="h-[40px] cursor-pointer absolute w-full bg-white flex justify-end px-3">
-          <PostMenu post={file} />
-        </div>
+        <PostMenu post={file} />
+      </div>
       <div className="w-full h-4/5 bg-gray-100 flex flex-col items-center justify-center p-4 space-y-6">
         <button
           onClick={handlePlayPause}
