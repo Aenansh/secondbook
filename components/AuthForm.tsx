@@ -25,7 +25,12 @@ const authFormSchema = (formtype: FormType) => {
   return z.object({
     username:
       formtype === "sign-up"
-        ? z.string().min(5).max(255)
+        ? z
+            .string()
+            .min(5)
+            .max(255)
+            .toLowerCase()
+            .regex(/^[a-zA-Z0-9]+$/)
         : z.string().optional(),
     email: z.email(),
     password: z

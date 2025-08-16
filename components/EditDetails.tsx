@@ -33,12 +33,22 @@ const EditDetails = ({
 
   const handleValue = async () => {
     try {
-      if (formType === "username") await changeUsername(user, value);
-      else await changeEmail(user, value);
+      if (formType === "username") {
+        if (value.match(/^[a-zA-Z0-9]+$/)) {
+          await changeUsername(user, value.toLowerCase());
+        } else {
+          toast.error(
+            "Username must not contain special characters and spaces!"
+          );
+          return;
+        }
+      } else await changeEmail(user, value);
+
+      toast.success(`Change your ${formType} successfully!`);
     } catch (error) {
       toast.error("Failed to change the details!");
     } finally {
-      setIsOpen(false)
+      setIsOpen(false);
     }
   };
   return (

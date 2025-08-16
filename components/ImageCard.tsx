@@ -25,7 +25,7 @@ const ImageCard = ({ file, user }: { file: Post; user: User }) => {
           src={file.url}
           alt={file.title}
           width={250}
-          height={400} // Corresponds to h-4/5 of 500px
+          height={400}
           className="w-full h-full object-cover"
         />
       </div>
