@@ -18,4 +18,5 @@ declare interface Post {
   owner: User;
   bucketFileId: string;
   name: string;
+  $createdAt: string;
 }

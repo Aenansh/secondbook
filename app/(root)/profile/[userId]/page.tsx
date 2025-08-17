@@ -34,6 +34,8 @@ const page = async ({ params }: UserParams) => {
   const files = await getUserPosts(userId);
   const posts: Post[] = files.documents;
 
+  console.log(posts[0])
+
   return (
     <>
       <div className="flex bg-[#1f1f1f] min-h-screen items-center flex-col gap-4 md:gap-6 p-8 md:p-16">

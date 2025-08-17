@@ -23,7 +23,7 @@ const CardDetails = ({ file, user }: { file: Post; user: User }) => {
             />
           </Link>
         </div>
-        <div className="flex justify-between gap-2 items-center px-1">
+        <div className="px-1 flex items-start justify-between">
           <p className="text-sm text-gray-600 truncate line-clamp-1">
             {file.description}
           </p>

@@ -139,8 +139,9 @@ export const loginUser = async ({
 }) => {
   try {
     const existingUser = await getUserByEmail(email);
-
-    if (existingUser) {
+    if (!existingUser)
+      throw new Error("New user detected, create an account first!");
+    else if (existingUser) {
       const { account } = await createAdminClient();
       const verifyPassword = await account.createEmailPasswordSession(
         email,

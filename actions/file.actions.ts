@@ -135,6 +135,7 @@ export const deletePost = async (post: Post, path: string) => {
 
 export const getPostById = async (postId: string) => {
   try {
+    console.log(postId)
     const { databases } = await createAdminClient();
 
     const post = await databases.listDocuments(
@@ -142,8 +143,7 @@ export const getPostById = async (postId: string) => {
       appConfig.fileCollId,
       [Query.equal("$id", postId)]
     );
-
-    return post.total > 0 ? post.documents[0] : null;
+    return post.total > 0 ? parseStringify(post.documents[0]) : null;
   } catch (error) {
     handleError(error, `Failed to fetch the post ${postId}`);
   }
