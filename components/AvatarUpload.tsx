@@ -12,13 +12,15 @@ import {
 import Image from "next/image";
 import { deleteAvatar } from "@/actions/user.actions";
 import { updateUserAvatar } from "@/actions/user.actions";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import ImageCropper from "./ImageCropper"; // Import the new component
 import { toast } from "sonner";
 
 const AvatarUpload = ({ avatar, user }: { avatar: string; user: User }) => {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const path = usePathname();
 
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -38,11 +40,23 @@ const AvatarUpload = ({ avatar, user }: { avatar: string; user: User }) => {
     setSelectedImage(null); // Close the modal
     setIsUploading(true);
     try {
-      await updateUserAvatar({ userId: user.$id, file: croppedFile });
+      await updateUserAvatar({ userId: user.$id, file: croppedFile, path });
       router.refresh();
     } catch (error) {
       console.error("Failed to upload new avatar", error);
       toast.error("Failed to upload the new avatar!");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsUploading(true);
+    try {
+      await deleteAvatar(path);
+      toast.success("Avatar successfully removed!");
+    } catch (error) {
+      toast.error("Couldn't remove your avatar!");
     } finally {
       setIsUploading(false);
     }
@@ -66,7 +80,10 @@ const AvatarUpload = ({ avatar, user }: { avatar: string; user: User }) => {
           <DropdownMenuItem onSelect={() => inputRef.current?.click()}>
             {isUploading ? "Uploading..." : "Change Avatar"}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={deleteAvatar} className="text-red-600">
+          <DropdownMenuItem
+            onClick={handleDelete}
+            className="text-red-600"
+          >
             Delete avatar
           </DropdownMenuItem>
         </DropdownMenuContent>

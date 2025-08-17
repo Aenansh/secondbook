@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -30,12 +31,13 @@ const EditDetails = ({
     formType === "username" ? user.username : user.email
   );
   const [isOpen, setIsOpen] = useState(false);
+  const path = usePathname();
 
   const handleValue = async () => {
     try {
       if (formType === "username") {
         if (value.match(/^[a-zA-Z0-9._]+$/)) {
-          await changeUsername(user, value.toLowerCase());
+          await changeUsername(user, value.toLowerCase(), path);
         } else {
           toast.error(
             "Username must not contain special characters and spaces!"
@@ -44,7 +46,7 @@ const EditDetails = ({
         }
       } else {
         if (value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
-          await changeEmail(user, value);
+          await changeEmail(user, value, path);
         } else {
           toast.error("Invalid email format!");
           return;

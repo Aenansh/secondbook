@@ -13,15 +13,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 const Privacy = ({ user }: { user: User }) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const path = usePathname();
   const handleClick = async () => {
     try {
-      await privacyUpdate(user.$id);
+      await privacyUpdate(user.$id, path);
       toast.success(
         `Successfully made your account ${!user.privacy ? "private" : "public"}`
       );

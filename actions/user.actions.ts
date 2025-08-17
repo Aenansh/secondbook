@@ -3,6 +3,7 @@
 import { createAdminClient, createSessionClient } from "@/lib/appwrite";
 import { appConfig } from "@/lib/appwrite/constants";
 import { constructFileUrl, parseStringify } from "@/lib/utils";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ID, Query } from "node-appwrite";
@@ -162,9 +163,11 @@ export const loginUser = async ({
 export const updateUserAvatar = async ({
   userId,
   file,
+  path,
 }: {
   userId: string;
   file: File;
+  path: string;
 }) => {
   try {
     const { storage, databases } = await createAdminClient();
@@ -194,14 +197,14 @@ export const updateUserAvatar = async ({
         avatarId: uploadedFile.$id,
       }
     );
-
+    revalidatePath(path);
     return JSON.parse(JSON.stringify(updatedUser));
   } catch (error) {
     handleError(error, "Failed to update avatar!");
   }
 };
 
-export const deleteAvatar = async () => {
+export const deleteAvatar = async (path: string) => {
   try {
     const { databases, storage } = await createAdminClient();
     const user = await getCurrentUser();
@@ -216,6 +219,7 @@ export const deleteAvatar = async () => {
     );
 
     await storage.deleteFile(appConfig.bucketId, user.avatarId);
+    revalidatePath(path);
   } catch (error) {
     handleError(error, "Couldn't delete the avatar!");
   }
@@ -318,7 +322,7 @@ export const deleteAccount = async (userId: string, accountId: string) => {
   }
 };
 
-export const privacyUpdate = async (userId: string) => {
+export const privacyUpdate = async (userId: string, path: string) => {
   try {
     const { databases } = await createAdminClient();
     const user = await databases.listDocuments(
@@ -334,12 +338,17 @@ export const privacyUpdate = async (userId: string) => {
         privacy: !user.documents[0].privacy,
       }
     );
+    revalidatePath(path);
   } catch (error) {
     handleError(error, "Failed to change the privacy settings!");
   }
 };
 
-export const changeUsername = async (user: User, newName: string) => {
+export const changeUsername = async (
+  user: User,
+  newName: string,
+  path: string
+) => {
   try {
     const { databases, users } = await createAdminClient();
 
@@ -350,6 +359,7 @@ export const changeUsername = async (user: User, newName: string) => {
       { username: newName }
     );
     await users.updateName(user.accountId, newName);
+    revalidatePath(path);
   } catch (error) {
     handleError(error, "failed to change the username!");
   }
@@ -357,8 +367,8 @@ export const changeUsername = async (user: User, newName: string) => {
 
 export const changeEmail = async (
   user: User,
-  newEmail: string
-  // password: string
+  newEmail: string,
+  path: string
 ) => {
   try {
     const { databases, users, account } = await createAdminClient();
@@ -370,6 +380,7 @@ export const changeEmail = async (
       user.$id,
       { email: newEmail }
     );
+    revalidatePath(path);
   } catch (error) {
     handleError(error, "failed to change the username!");
   }
