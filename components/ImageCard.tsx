@@ -5,7 +5,6 @@ import Image from "next/image";
 import PostMenu from "./PostMenu";
 import Link from "next/link";
 import CardDetails from "./CardDetails";
-import { redirect } from "next/navigation";
 import { postRoute } from "@/constants";
 
 const ImageCard = ({ file, user }: { file: Post; user: User }) => {
@@ -46,7 +45,7 @@ const ImageCard = ({ file, user }: { file: Post; user: User }) => {
       className="w-[250px] h-[500px] bg-white flex flex-col rounded-xl overflow-hidden shadow-lg cursor-pointer group p-1"
     >
       {/* Image Container */}
-      <div className="relative w-full h-4/5" onClick={() => redirect(`/open/${postRoute(file.owner.$id, file.$id)}`)}>
+      <Link href={`/open/${postRoute(file.owner.accountId, file.$id)}`} className="relative w-full h-4/5">
         <div className="h-[40px] cursor-pointer absolute w-full bg-white flex justify-end px-3">
           <PostMenu post={file} />
         </div>
@@ -57,7 +56,7 @@ const ImageCard = ({ file, user }: { file: Post; user: User }) => {
           height={400}
           className="w-full h-full object-cover"
         />
-      </div>
+      </Link>
 
       {/* Details Section */}
       <CardDetails file={file} user={user} />

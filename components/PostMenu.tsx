@@ -13,16 +13,27 @@ import { deletePost } from "@/actions/file.actions";
 import { toast } from "sonner";
 import Link from "next/link";
 import { constructDownloadUrl } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 const PostMenu = ({ post }: { post: Post }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { userId } = useAccount();
+  const path = usePathname();
 
   const [isMounted, setIsMounted] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const handleDelete = async () => {
+    try {
+      await deletePost(post, path);
+      toast.success("Post deleted!");
+    } catch (error) {
+      toast.error("Couldn't delete the post, try again.");
+    }
+  };
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger className="active:border-none outline-none text-black">
@@ -44,10 +55,7 @@ const PostMenu = ({ post }: { post: Post }) => {
           </Link>
         </DropdownMenuItem>
         {isMounted && post.owner.$id === userId && (
-          <DropdownMenuItem
-            className="text-red-600"
-            onClick={async () => deletePost(post)}
-          >
+          <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
             Delete
           </DropdownMenuItem>
         )}

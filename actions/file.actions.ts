@@ -6,6 +6,7 @@ import { constructFileUrl, getFileType, parseStringify } from "@/lib/utils";
 import { ID, Query } from "node-appwrite";
 import { InputFile } from "node-appwrite/file";
 import { getCurrentUser } from "./user.actions";
+import { revalidatePath } from "next/cache";
 
 interface fileParams {
   file: File;
@@ -88,11 +89,11 @@ export const getAllPosts = async () => {
       appConfig.dbId,
       appConfig.userCollId, // Your users collection ID
       [
-        Query.equal("privacy", [false]) // Find users where privacy is false
+        Query.equal("privacy", [false]), // Find users where privacy is false
       ]
     );
 
-    const publicUserIds = publicUsersResponse.documents.map(user => user.$id);
+    const publicUserIds = publicUsersResponse.documents.map((user) => user.$id);
 
     // If no public users are found, return an empty array immediately.
     if (publicUserIds.length === 0) {
@@ -106,19 +107,18 @@ export const getAllPosts = async () => {
       [
         // Find posts where the 'owner' ID is in our list of public user IDs
         Query.equal("owner", publicUserIds),
-        Query.notEqual("type", "avatar") // Optional: exclude avatars
+        Query.notEqual("type", "avatar"), // Optional: exclude avatars
       ]
     );
 
     return parseStringify(publicPosts);
-
   } catch (error) {
     console.error("Failed to fetch public posts:", error);
     return { documents: [] };
   }
 };
 
-export const deletePost = async (post: Post) => {
+export const deletePost = async (post: Post, path: string) => {
   try {
     const { databases, storage } = await createAdminClient();
     await databases.deleteDocument(
@@ -127,7 +127,24 @@ export const deletePost = async (post: Post) => {
       post.$id
     );
     await storage.deleteFile(appConfig.bucketId, post.bucketFileId);
+    revalidatePath(path);
   } catch (error) {
     handleError(error, "Couldn't delete the post!");
+  }
+};
+
+export const getPostById = async (postId: string) => {
+  try {
+    const { databases } = await createAdminClient();
+
+    const post = await databases.listDocuments(
+      appConfig.dbId,
+      appConfig.fileCollId,
+      [Query.equal("$id", postId)]
+    );
+
+    return post.total > 0 ? post.documents[0] : null;
+  } catch (error) {
+    handleError(error, `Failed to fetch the post ${postId}`);
   }
 };

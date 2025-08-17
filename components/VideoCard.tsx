@@ -6,6 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import CardDetails from "./CardDetails";
 import PostMenu from "./PostMenu";
+import { redirect } from "next/navigation";
+import { postRoute } from "@/constants";
 
 const VideoCard = ({ file, user }: { file: Post; user: User }) => {
   // State to track hover status to show/hide the UI
@@ -81,14 +83,16 @@ const VideoCard = ({ file, user }: { file: Post; user: User }) => {
         <div className="h-[40px] absolute z-10 cursor-pointer w-full bg-white flex justify-end px-3">
           <PostMenu post={file} />
         </div>
-        <video
-          ref={videoRef}
-          src={file.url}
-          loop
-          muted // Start muted
-          playsInline
-          className="w-full h-full object-cover p-1" // Use object-contain to fit the video
-        />
+        <Link href={`/open/${postRoute(file.owner.accountId, file.$id)}`}>
+          <video
+            ref={videoRef}
+            src={file.url}
+            loop
+            muted // Start muted
+            playsInline
+            className="w-full h-full object-cover p-1" // Use object-contain to fit the video
+          />
+        </Link>
         {/* Mute button overlay */}
         {isHovered && (
           <div className="absolute top-12 right-2">
