@@ -10,6 +10,8 @@ import AudioPlayer from "@/components/AudioCard";
 import { use } from "react";
 import Avatar from "@/components/Avatar";
 import Settings from "@/components/Settings";
+import { useAccount } from "@/contexts/AccountProvider";
+import { Lock } from "lucide-react";
 
 // Assuming User and Post types are globally available
 interface Userid {
@@ -65,31 +67,49 @@ const page = async ({ params }: UserParams) => {
             <p className="text-sm text-gray-200">{profileUser.email}</p>
           </div>
         </div>
-        {/* Posts Grid */}
-        <div className="mx-2 md:mx-5 py-4 md:py-8 md:my-10 my-5 px-4 md:px-8 flex flex-wrap gap-6 justify-center">
-          {posts.length > 0 ? (
-            posts
-              // Filter out posts that don't have a URL or a valid owner object
-              .filter((post) => post.url && post.owner)
-              .map((post) => (
-                <div key={post.$id}>
-                  {post.type === "image" && (
-                    <ImageCard file={post} user={post.owner} />
-                  )}
-                  {post.type === "video" && (
-                    <VideoCard file={post} user={post.owner} />
-                  )}
-                  {post.type === "audio" && (
-                    <AudioPlayer file={post} user={post.owner} />
-                  )}
-                </div>
-              ))
-          ) : (
-            <p className="text-white text-center">
-              This user has no posts yet. <Link className="font-bold" href={`/upload/${userId}`} >Create one?</Link>
+        {profileUser.privacy  && userId !== currUser.accountId ? (
+          <div className="flex flex-col items-center justify-center gap-1 mt-16">
+            <Lock width={20} height={20} color="white" />
+            <p className="text-xl text-white font-semibold ">
+              This account is private
             </p>
-          )}
-        </div>
+          </div>
+        ) : (
+          <>
+            {/* Posts Grid */}
+            <div className="mx-2 md:mx-5 py-4 md:py-8 md:my-10 my-5 px-4 md:px-8 flex flex-wrap gap-6 justify-center">
+              {posts.length > 0 ? (
+                posts
+                  // Filter out posts that don't have a URL or a valid owner object
+                  .filter((post) => post.url && post.owner)
+                  .map((post) => (
+                    <div key={post.$id}>
+                      {post.type === "image" && (
+                        <ImageCard file={post} user={post.owner} />
+                      )}
+                      {post.type === "video" && (
+                        <VideoCard file={post} user={post.owner} />
+                      )}
+                      {post.type === "audio" && (
+                        <AudioPlayer file={post} user={post.owner} />
+                      )}
+                    </div>
+                  ))
+              ) : (
+                <p className="text-white text-center">
+                  This user has no posts yet.{" "}
+                  {userId === currUser.accountId ? (
+                    <Link className="font-bold" href={`/upload/${userId}`}>
+                      Create one?
+                    </Link>
+                  ) : (
+                    ""
+                  )}
+                </p>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </>
   );
