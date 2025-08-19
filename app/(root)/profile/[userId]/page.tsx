@@ -40,7 +40,7 @@ const page = async ({ params }: UserParams) => {
     <>
       <div className="flex bg-[#1f1f1f] min-h-screen items-center flex-col gap-4 md:gap-6 p-8 md:p-16">
         {/* Header */}
-        <div className="bg-[#1f1f1f] rounded-md py-4 w-fit px-4 self-center justify-center items-center gap-3 flex mb-4">
+        <div className="bg-[#1f1f1f] rounded-md py-4 w-fit px-4 self-center justify-center items-center gap-3 flex mb-4 mt-10">
           <Image src={"/logo.svg"} alt="logo" width={40} height={44} />
           <span className="font-semibold text-[32px] md:text-[48px] text-white">
             SecondBook

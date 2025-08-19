@@ -10,7 +10,7 @@ const Home = async () => {
   return (
     <>
       <div className="min-h-screen overflow-x-hidden flex flex-col items-center">
-        <div className="py-4 w-fit px-4 self-center justify-center items-center gap-3 flex mb-4">
+        <div className="py-4 w-fit px-4 self-center justify-center items-center gap-3 flex mb-4 mt-10">
           <Image src={"/logo-dark.svg"} alt="logo" width={40} height={44} />
           <span className="font-semibold text-[32px] md:text-[48px] text-[#1f1f1f]">
             SecondBook

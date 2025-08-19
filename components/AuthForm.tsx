@@ -18,6 +18,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createUserAccount, loginUser } from "@/actions/user.actions";
 import OTPModal from "./OTPModal";
+import { EyeIcon, EyeOff } from "lucide-react";
 
 type FormType = "sign-in" | "sign-up";
 
@@ -49,6 +50,7 @@ const authFormSchema = (formtype: FormType) => {
   });
 };
 const AuthForm = ({ type }: { type: FormType }) => {
+  const [hidden, setHidden] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [accountId, setAccountId] = useState(null);
@@ -148,12 +150,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
                       Password
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter your password"
-                        {...field}
-                        className="border-none shadow-none p-0 outline-none ring-offset-transparent focus:ring-transparent focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 text-[14px] leading-[20px]"
-                      />
+                      <div className="flex items-center">
+                        <Input
+                          type={hidden ? "password" : "text"}
+                          placeholder="Enter your password"
+                          {...field}
+                          className="border-none shadow-none p-0 outline-none ring-offset-transparent focus:ring-transparent focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 text-[14px] leading-[20px]"
+                        />
+                        <span onClick={() => setHidden(!hidden)} >{hidden ? <EyeIcon color="gray" /> : <EyeOff color="gray" />}</span>
+                      </div>
                     </FormControl>
                   </div>
                   <FormMessage className="text-red-500 text-[14px] leading-[20px] ml-4" />
